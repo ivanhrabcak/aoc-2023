@@ -1,57 +1,18 @@
 const fs = require('fs')
 
-const partTwo = (games) => {      
-    return games
-        .map(([gameId, draws]) => {
-            const max = draws.reduce((acc, draw) => {
-                if (draw.red > acc.red) {
-                    acc.red = draw.red
-                }
-
-                if (draw.green > acc.green) {
-                    acc.green = draw.green
-                }
-
-                if (draw.blue > acc.blue) {
-                    acc.blue = draw.blue
-                }
-
-                return acc
-            }, {red: 0, green: 0, blue: 0})
-
-            return {gameId, max}
-        })
+const partTwo = (maxRollsPerColor) => {      
+    return maxRollsPerColor
         .reduce((acc, {max}) => acc += max.red * max.green * max.blue, 0)
 }
-
 
 const isPossible = (o, maxAllowed) =>
     o.red <= maxAllowed.red && o.green <= maxAllowed.green && o.blue <= maxAllowed.blue
 
-const partOne = (games) => {
+const partOne = (maxRollsPerColor) => {
     const maxAllowed = {red: 12, green: 13, blue: 14}
     
         
-    return games
-        .map(([gameId, draws]) => {
-            const max = draws.reduce((acc, draw) => {
-                if (draw.red > acc.red) {
-                    acc.red = draw.red
-                }
-
-                if (draw.green > acc.green) {
-                    acc.green = draw.green
-                }
-
-                if (draw.blue > acc.blue) {
-                    acc.blue = draw.blue
-                }
-
-                return acc
-            }, {red: 0, green: 0, blue: 0})
-
-            return {gameId, max}
-        })
+    return maxRollsPerColor
         .filter(({max}) => isPossible(max, maxAllowed))
         .reduce((acc, {gameId}) => acc + gameId, 0)
 }
@@ -76,9 +37,29 @@ const main = () => {
                     
             ]
         )
+    
+    const maxRollsPerColor = games.map(([gameId, draws]) => {
+        const max = draws.reduce((acc, draw) => {
+            if (draw.red > acc.red) {
+                acc.red = draw.red
+            }
 
-    console.log(partOne(games))
-    console.log(partTwo(games))
+            if (draw.green > acc.green) {
+                acc.green = draw.green
+            }
+
+            if (draw.blue > acc.blue) {
+                acc.blue = draw.blue
+            }
+
+            return acc
+        }, {red: 0, green: 0, blue: 0})
+
+        return {gameId, max}
+    })
+
+    console.log(partOne(maxRollsPerColor))
+    console.log(partTwo(maxRollsPerColor))
 }
 
 main()
