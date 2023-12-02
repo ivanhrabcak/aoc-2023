@@ -1,12 +1,15 @@
 const fs = require('fs')
 
+const orDefault = (x, def) => x ? x : def
+const isPossible = (roll, maxAllowed) =>
+    roll.red <= maxAllowed.red && roll.green <= maxAllowed.green && roll.blue <= maxAllowed.blue
+
 const partTwo = (maxRollsPerColor) => {      
     return maxRollsPerColor
         .reduce((acc, {max}) => acc += max.red * max.green * max.blue, 0)
 }
 
-const isPossible = (o, maxAllowed) =>
-    o.red <= maxAllowed.red && o.green <= maxAllowed.green && o.blue <= maxAllowed.blue
+
 
 const partOne = (maxRollsPerColor) => {
     const maxAllowed = {red: 12, green: 13, blue: 14}
@@ -39,21 +42,11 @@ const main = () => {
         )
     
     const maxRollsPerColor = games.map(([gameId, draws]) => {
-        const max = draws.reduce((acc, draw) => {
-            if (draw.red > acc.red) {
-                acc.red = draw.red
-            }
-
-            if (draw.green > acc.green) {
-                acc.green = draw.green
-            }
-
-            if (draw.blue > acc.blue) {
-                acc.blue = draw.blue
-            }
-
-            return acc
-        }, {red: 0, green: 0, blue: 0})
+        const max = draws.reduce((acc, draw) => ({
+            red: orDefault(Math.max(draw.red, acc.red), acc.red), 
+            green: orDefault(Math.max(draw.green, acc.green), acc.green),
+            blue: orDefault(Math.max(draw.blue, acc.blue), acc.blue),
+        }), {red: 0, green: 0, blue: 0})
 
         return {gameId, max}
     })
