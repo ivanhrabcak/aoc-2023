@@ -9,8 +9,6 @@ const partTwo = (maxRollsPerColor) => {
         .reduce((acc, {max}) => acc += max.red * max.green * max.blue, 0)
 }
 
-
-
 const partOne = (maxRollsPerColor) => {
     const maxAllowed = {red: 12, green: 13, blue: 14}
     
