@@ -2,11 +2,13 @@ const fs = require('fs')
 
 const orDefault = (x, def) => x ? x : def
 const isPossible = (roll, maxAllowed) =>
-    roll.red <= maxAllowed.red && roll.green <= maxAllowed.green && roll.blue <= maxAllowed.blue
+    roll.red <= maxAllowed.red && 
+    roll.green <= maxAllowed.green && 
+    roll.blue <= maxAllowed.blue
 
 const partTwo = (maxRollsPerColor) => {      
     return maxRollsPerColor
-        .reduce((acc, {max}) => acc += max.red * max.green * max.blue, 0)
+        .reduce((acc, {max}) => acc + max.red * max.green * max.blue, 0)
 }
 
 const partOne = (maxRollsPerColor) => {
