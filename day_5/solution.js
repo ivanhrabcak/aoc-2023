@@ -7,7 +7,7 @@ const convert = (x, range) => range[0] + (x - range[1])
 const partOne = (seeds, conversions) => {
     let currentUnit = 'seed';
 
-    let currentValues = [...seeds]
+    let currentValues = seeds
 
     while (currentUnit != 'location') {
         const conversion = findConversion(currentUnit, conversions)
