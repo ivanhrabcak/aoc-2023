@@ -10,18 +10,28 @@ const partOne = (seeds, conversions) => {
     let currentValues = seeds
 
     while (currentUnit != 'location') {
+        // console.log(currentUnit)
         const conversion = findConversion(currentUnit, conversions)
         const conversionRanges = conversion.ranges
 
-        currentValues = currentValues.map(currentValue => {
-            const conversionRange = conversionRanges.find(r => couldRangeBeUsed(currentValue, r[1], r[2]))
+        for (let i = 0; i < currentValues.length; i++) {
+            const conversionRange = conversionRanges.find(r => couldRangeBeUsed(currentValues[i], r[1], r[2]))
 
             if (conversionRange === undefined) {
-                return currentValue
+                continue
             }
 
-            return convert(currentValue, conversionRange)
-        })
+            currentValues[i] = convert(currentValues[i], conversionRange)
+        }
+        // currentValues = currentValues.map(currentValue => {
+        //     const conversionRange = conversionRanges.find(r => couldRangeBeUsed(currentValue, r[1], r[2]))
+
+        //     if (conversionRange === undefined) {
+        //         return currentValue
+        //     }
+
+        //     return convert(currentValue, conversionRange)
+        // })
 
         currentUnit = conversion.to
     }
@@ -30,12 +40,32 @@ const partOne = (seeds, conversions) => {
 }
 
 const partTwo = (seeds, conversions) => {
-    const seedPairs = seeds.map((seed, i, allSeeds) => i % 2 == 1 ? [allSeeds[i - 1], seed] : null)
-        .filter(k => k != null)
+    let minimum = 9999999999999999999999999999999999999999999999999
+    for (let i = 0; i < seeds.length; i += 2) {
+        const [start, size] = [seeds[i], seeds[i + 1]]
+        for (let j = start; j <= start + size + 800; j += 100) {
+            const batch = []
+            for (let k = start + j; start + j + 100; k++) {
+                if (k > start + size) {
+                    break
+                }
 
-    const allSeeds = seedPairs.flatMap(([start, size]) => new Array(size).fill(0).map((_, i) => start + i))
+                batch.push(j)
+            }
 
-    return partOne(allSeeds, conversions)
+            if (batch.length == 0) {
+                continue
+            }
+
+            const potentiallyNewMinimum = partOne(batch, conversions)
+            minimum = Math.min(minimum, potentiallyNewMinimum)
+            delete batch
+        }
+        console.log(`${i}/${seeds.length}`)
+    }
+
+    // const allSeeds = seedPairs.flatMap(([start, size]) => new Array(size).fill(0).map((_, i) => start + i))
+    return minimum
 }
 
 const main = () => {
