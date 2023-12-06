@@ -7,7 +7,7 @@ fn transform_seed(steps: &Vec<Vec<(u64, u64, u64)>>, seed: u64) -> u64 {
         for (dest_start, src_start, size) in ranges {
             let src_end = src_start + size;
 
-            if &transformed_seed >= src_start && transformed_seed <= src_end {
+            if &transformed_seed >= src_start && transformed_seed < src_end {
                 transformed_seed = (transformed_seed - src_start) + dest_start;
                 break;
             }
