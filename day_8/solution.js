@@ -3,6 +3,8 @@ const fs = require('fs')
 const lookupNode = (name, nodes) =>
     nodes.find(k => k.name == name)
 
+const gcd = (a, b) => a ? gcd(b % a, a) : b;
+const lcm = (a, b) => a * b / gcd(a, b);
 
 const partOne = (instructions, nodes) => {
     let i = 0
@@ -26,36 +28,39 @@ const partOne = (instructions, nodes) => {
         }
     }
 
-    console.log({node})
-
     return steps
 }
 
 const partTwo = (instructions, nodes) => {
     let i = 0
-    let steps = 0
-
+    
     let myNodes = nodes.filter(k => k.name[2] == 'A')
-    while (myNodes.filter(k => k.name[2] === 'Z').length !== myNodes.length) {
-        const instruction = instructions[i]
 
-        if (instruction == 'R') {
-            myNodes = myNodes.map(k => lookupNode(k.right, nodes))
-        } else {
-            myNodes = myNodes.map(k => lookupNode(k.left, nodes))
+    let steps = myNodes.map(startingNode => {
+        let node = startingNode
+        let steps = 0
+        while (node.name[2] !== 'Z') {
+    
+            const instruction = instructions[i]
+    
+            if (instruction == 'R') {
+                node = lookupNode(node.right, nodes)
+            } else {
+                node = lookupNode(node.left, nodes)
+            }
+    
+            steps++
+            i++
+    
+            if (i >= instructions.length) {
+                i = 0
+            }
         }
 
-        steps++
-        i++
+        return steps
+    })
 
-        if (i >= instructions.length) {
-            i = 0
-        }
-    }
-
-    console.log({myNodes})
-
-    return steps
+    return steps.reduce(lcm)
 }
 
 const main = () => {
@@ -74,9 +79,8 @@ const main = () => {
             .filter(k => k !== undefined)
         )
         .map(l => l[0])
-    // console.log(nodes)
-    // console.log(lookupNode('BBB', nodes))
-    // console.log(partOne(instructions, nodes))
+    
+    console.log(partOne(instructions, nodes))
     console.log(partTwo(instructions, nodes))
     
 }
