@@ -93,9 +93,6 @@ const main = () => {
     
     console.log(partOne(galaxyMap, lines, cols))
     console.log(partTwo(galaxyMap, lines, cols))
-
-    // console.log(expand(4, 6, galaxyMap, 1))
-    
 }
 
 main()
