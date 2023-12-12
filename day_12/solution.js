@@ -1,17 +1,19 @@
 const fs = require('fs')
 
-const cache = {}
-const divideToGroups = (sPartitial) => {
-    if (cache[sPartitial] !== undefined) {
-        return cache[sPartitial]
+let cache = {}
+const isValidPartial = (sPartitial, grouping, targetLength) => {
+    let groups = []
+
+    if (sPartitial.length > targetLength) {
+        return false
     }
 
-    let groups = []
+
     for (let i = 0; i < sPartitial.length; i++) {
         const current = sPartitial[i]
         if (i === 0) {
             if (current === '#') {
-                groups.push('#')
+                groups.push(1)
             }
 
             continue
@@ -19,23 +21,28 @@ const divideToGroups = (sPartitial) => {
 
         const previous = sPartitial[i - 1]
         if (previous === '#' && current === '#') {
-            groups[groups.length - 1] = groups[groups.length - 1] + '#'
+            groups[groups.length - 1] += 1
         } else if (current === '#' && previous === '.') {
-            groups.push('#')
+            groups.push(1)
         }
 
-    }
+        if (current == '.' && previous == '#') {
+            if (groups.length > grouping.length) {
+                return false
+            }
 
-    cache[sPartitial] = groups
-
-    return groups
-}
-
-const isValidPartial = (sPartitial, grouping, targetLength) => {
-    let groups = divideToGroups(sPartitial)
-
-    if (groups.length > grouping.length) {
-        return false
+            for (let k = 0; k < groups.length; k++) {
+                if (k !== groups.length - 1) {
+                    if (groups[k] != grouping[k]) {
+                        return false
+                    }
+                } else {
+                    if (groups[k] > grouping[k]) {
+                        return false
+                    }
+                }
+            }
+        }
     }
     
     if (targetLength == sPartitial.length) {
@@ -44,7 +51,7 @@ const isValidPartial = (sPartitial, grouping, targetLength) => {
         }
 
         for (let i = 0; i < groups.length; i++) {
-            if (groups[i].length != grouping[i]) {
+            if (groups[i] != grouping[i]) {
                 return false
             }
         }
@@ -57,7 +64,7 @@ const isValidPartial = (sPartitial, grouping, targetLength) => {
             return !(groups[i].length > grouping[i])
         } 
         
-        if (groups[i].length !== grouping[i]) {
+        if (groups[i] !== grouping[i]) {
             return false
         }
     }
@@ -94,7 +101,9 @@ const countPossibleArrangements = (template, groups, arrangement = '') => {
 }
 
 const partOne = (undeterminedArrangements) => {
-    return undeterminedArrangements.reduce((acc, [template, grouping], i) => {
+    return undeterminedArrangements.reduce((acc, [template, grouping], i, arr) => {
+        console.log(`${i}/${arr.length - 1}`)
+        cache = {}
         return acc + countPossibleArrangements(template, grouping)
     }, 0)
 }
@@ -107,7 +116,7 @@ const partTwo = (undeterminedArrangements) => {
 }
 
 const main = () => {
-    const undeterminedArrangements = fs.readFileSync('./input.txt').toString().split('\n')
+    const undeterminedArrangements = fs.readFileSync('C:/Users/ivanh/Repositories/aoc-2023/day_12/input.txt').toString().split('\n')
         .map(l => l.split(' '))
         .filter(a => a.length != 1)
         .map(([a, groups]) => [a, groups.split(',').map(k => parseInt(k))])
