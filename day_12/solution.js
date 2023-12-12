@@ -1,6 +1,9 @@
 const fs = require('fs')
 
-let cache = {}
+DOT = 0
+X = 1
+SOMETHING = 3
+
 const isValidPartial = (sPartitial, grouping, targetLength) => {
     let groups = []
 
@@ -12,7 +15,7 @@ const isValidPartial = (sPartitial, grouping, targetLength) => {
     for (let i = 0; i < sPartitial.length; i++) {
         const current = sPartitial[i]
         if (i === 0) {
-            if (current === '#') {
+            if (current === X) {
                 groups.push(1)
             }
 
@@ -20,13 +23,13 @@ const isValidPartial = (sPartitial, grouping, targetLength) => {
         }
 
         const previous = sPartitial[i - 1]
-        if (previous === '#' && current === '#') {
+        if (previous === X && current === X) {
             groups[groups.length - 1] += 1
-        } else if (current === '#' && previous === '.') {
+        } else if (current === X && previous === DOT) {
             groups.push(1)
         }
 
-        if (current == '.' && previous == '#') {
+        if (current == DOT && previous == X) {
             if (groups.length > grouping.length) {
                 return false
             }
@@ -72,7 +75,7 @@ const isValidPartial = (sPartitial, grouping, targetLength) => {
     return true
 }
 
-const countPossibleArrangements = (template, groups, arrangement = '') => {
+const countPossibleArrangements = (template, groups, arrangement = []) => {
     const isValid = isValidPartial(arrangement, groups, template.length)
 
     if (arrangement.length === template.length) {
@@ -85,14 +88,14 @@ const countPossibleArrangements = (template, groups, arrangement = '') => {
     let possibleArrangement = arrangement
     
     let i = arrangement.length
-    while (i !== template.length && template[i] !== '?') {
-        possibleArrangement += template[i]
+    while (i !== template.length && template[i] !== SOMETHING) {
+        possibleArrangement.push(template[i])
         i++
     }
 
     if (i !== template.length) {
-        sum += countPossibleArrangements(template, groups, possibleArrangement + '.')
-        sum += countPossibleArrangements(template, groups, possibleArrangement + '#')
+        sum += countPossibleArrangements(template, groups, [...possibleArrangement, DOT])
+        sum += countPossibleArrangements(template, groups, [...possibleArrangement, X])
 
         return sum
     } 
@@ -109,20 +112,42 @@ const partOne = (undeterminedArrangements) => {
 }
 
 const repeat = (arr, n) => new Array(arr.length * n).fill(0).map((_, i) => arr[i % arr.length])
+const repeatArrangement = (arr) => {
+    let result = []
+    for (let i = 0; i < 5; i++) {
+        if (i != 0) {
+            result.push(SOMETHING)
+        }
+
+        for (let j = 0; j < arr.length; j++) {
+            result.push(arr[j])
+        }
+    }
+
+    return result
+}
 
 const partTwo = (undeterminedArrangements) => {
-    undeterminedArrangements = undeterminedArrangements.map(([arr, grouping]) => [repeat([arr], 5).join('?'), repeat(grouping, 5)])
+    undeterminedArrangements = undeterminedArrangements.map(([arr, grouping]) => [
+        repeatArrangement(arr), 
+        repeat(grouping, 5)
+    ])
+
     return partOne(undeterminedArrangements)
 }
 
 const main = () => {
+    // ? => 3
+    // # => 2
+    // . => 1
+
     const undeterminedArrangements = fs.readFileSync('C:/Users/ivanh/Repositories/aoc-2023/day_12/input.txt').toString().split('\n')
         .map(l => l.split(' '))
         .filter(a => a.length != 1)
-        .map(([a, groups]) => [a, groups.split(',').map(k => parseInt(k))])
-
+        .map(([a, groups]) => [[...a].map(k => k == '?' ? 3 : k == '#' ? 1 : 0), groups.split(',').map(k => parseInt(k))])
+    
     console.log(partOne(undeterminedArrangements))
     console.log(partTwo(undeterminedArrangements))
 }
 
-main()
+main() 
