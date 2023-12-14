@@ -75,7 +75,7 @@ const partTwo = (patterns) => {
 }
 
 const main = () => {
-    const patterns = fs.readFileSync('C:/Users/ivanh/Repositories/aoc-2023/day_13/input.txt').toString().split('\n\n').map(p => p.split('\n'))
+    const patterns = fs.readFileSync('./input.txt').toString().split('\n\n').map(p => p.split('\n'))
 
     console.log(partOne(patterns))
     console.log(partTwo(patterns))
